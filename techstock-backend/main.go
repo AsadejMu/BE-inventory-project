@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/joho/godotenv"
 
 	"techstock/auth"
 	"techstock/handler"
@@ -27,10 +28,16 @@ func getenv(key, fallback string) string {
 }
 
 func main() {
-	secret := os.Getenv("JWT_SECRET")
-	if len(secret) < 32 {
-		log.Fatal("JWT_SECRET ต้องยาวอย่างน้อย 32 ตัวอักษร (สร้างด้วย: openssl rand -hex 32)")
-	}
+	// โหลดค่าจากไฟล์ .env
+    if err := godotenv.Load(); err != nil {
+        log.Println("ไม่พบไฟล์ .env ใช้ Environment Variables แทน")
+    }
+
+    secret := os.Getenv("JWT_SECRET")
+    if len(secret) < 32 {
+        log.Fatal("JWT_SECRET ต้องยาวอย่างน้อย 32 ตัวอักษร")
+    }
+	
 	pool, err := pgxpool.New(context.Background(), os.Getenv("DATABASE_URL"))
 	if err != nil {
 		log.Fatal(err)
@@ -95,7 +102,7 @@ func main() {
 	mux.HandleFunc("GET /api/dashboard/low-stock", only("admin", h.LowStock))
 
 	// ทางเดินหน้าครัว: Logging > Recovery > CORS > Timeout > mux
-	origins := strings.Split(getenv("ALLOWED_ORIGINS", "http://localhost:5173"), ",")
+	origins := strings.Split(getenv("ALLOWED_ORIGINS", "http://localhost:5173,http://127.0.0.1:5173"), ",")
 	var app http.Handler = http.TimeoutHandler(mux, 10*time.Second, "ครัวใช้เวลานานเกินไป")
 	app = mw.Logging(mw.Recovery(mw.CORS(origins, app)))
 
