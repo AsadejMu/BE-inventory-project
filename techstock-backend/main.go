@@ -12,7 +12,7 @@ import (
 	"time"
 
 	"github.com/jackc/pgx/v5/pgxpool"
-	"github.com/joho/godotenv"
+	"github.com/joho/godotenv/autoload"
 
 	"techstock/auth"
 	"techstock/handler"
@@ -37,7 +37,7 @@ func main() {
     if len(secret) < 32 {
         log.Fatal("JWT_SECRET ต้องยาวอย่างน้อย 32 ตัวอักษร")
     }
-	
+
 	pool, err := pgxpool.New(context.Background(), os.Getenv("DATABASE_URL"))
 	if err != nil {
 		log.Fatal(err)
