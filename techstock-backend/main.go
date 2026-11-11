@@ -12,7 +12,7 @@ import (
 	"time"
 
 	"github.com/jackc/pgx/v5/pgxpool"
-	"github.com/joho/godotenv/autoload"
+	"github.com/joho/godotenv"
 
 	"techstock/auth"
 	"techstock/handler"
